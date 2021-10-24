@@ -1,42 +1,35 @@
+/**
+ * @brief this document difine the class database. This class
+ * will do CRUD operations on the database. It will be instanciated in all of
+ * the class in ./src/service.
+ */
 import * as dotenv from "dotenv";
-import { query } from "express";
 import * as mongoDB from "mongodb";
 export class Database {
   private URI: string;
+  private client : any;
   //private db : mongoDB.Db;
   constructor() {
     dotenv.config();
+    //! USE DOTENV TO PROTECT THE API KEY
     this.URI =
       "mongodb+srv://Mansour:wCC8TQQuHs19qHmG@cluster0.kzxle.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-  }
-  async connectToDatabase() {
+        // Create a new MongoDB client with the connection string from .env
+      this.client = new mongoDB.MongoClient(this.URI);
+    }
+    async connectToDatabase() {
     // Pulls in the .env file so it can be accessed from process.env. No path as .env is in root, the default location
     dotenv.config();
-    // Create a new MongoDB client with the connection string from .env
-    const client = new mongoDB.MongoClient(this.URI);
-    // Connect to the database with the name specified in .env
-    const db = client.db(process.env.DB_NAME);
 
     try {
       // Connect to the cluster
-      await client.connect();
+      await this.client.connect();
       console.log("Successfully connected to database");
     } catch (error) {
-      console.error(error);
+      console.error(error);//TODO: Use Class test
     }
-
-    /*
-        // Connect to the collection with the specific name from .env, found in the database previously specified
-        const gamesCollection: mongoDB.Collection = db.collection(TAGS_COLLECTION_NAME);
-    
-        // Persist the connection to the Games collection
-        collections.games = gamesCollection;
-    
-        console.log(
-            `Successfully connected to database: ${db.databaseName} and collection: ${gamesCollection.collectionName}`,
-        );*/
   }
-  async disconnectOfDatabase() {
+    async disconnectOfDatabase() {
     const client = new mongoDB.MongoClient(this.URI);
 
     try {
@@ -48,11 +41,22 @@ export class Database {
     }
   }
 
-    insert(collection: string, query: object): string {
-    return "";
+  insert(collection: string, query: object): string {
+  return "";
 }
-    insertOne(collection: string, query: object): string {
-    return "";
+  /**
+   * @brief insert a single document into the collection.
+   * @param collection 
+   * @param query : the document to put in the collection
+   * @returns 
+   * !USE DOTENV TO REMPLACE "Mansour" value
+   */
+  async insertOne(collection: string, query: object): Promise<void> {
+    try {
+      await this.client.collection(collection).insertOne(query)
+    } catch (error) {
+      console.error(error);
+    }
 }
     insertMany(collection: string , query : object):string{
     return "";
