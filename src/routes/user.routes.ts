@@ -11,14 +11,13 @@ export const userRouter = express.Router();
 userRouter.use(express.json());
 // GET
 
-userRouter.get("/e", async (_req: Request, res: Response) => {
+userRouter.get("/", async (_req: Request, res: Response) => {
     try {
         // Call find with an empty filter object, meaning it returns all documents in the collection. Saves as Game array to take advantage of types
         const users = (await collections.user?.find({}).toArray()) as User[];
 
         res.status(200).send(users);
     } catch (error ) {
-        console.log("lol")
         res.status(500).send(error);
     }
 });
@@ -29,10 +28,10 @@ userRouter.get("/:id", async (req: Request, res: Response) => {
     try {
         // _id in MongoDB is an objectID type so we need to find our specific document by querying
         const query = { _id: new ObjectId(id) };
-        const game = (await collections.user?.findOne(query)) as User;
+        const user = (await collections.user?.findOne(query)) as User;
 
-        if (game) {
-            res.status(200).send(game);
+        if (user) {
+            res.status(200).send(user);
         }
     } catch (error) {
         res.status(404).send(`Unable to find matching document with id: ${req.params.id}`);
