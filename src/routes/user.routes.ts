@@ -6,6 +6,7 @@ import {user , Document} from "../model/model"
 import { collections } from "../service/database.service";
 import {User} from "../model/User";
 import * as bcrypt from "bcrypt";
+import * as jwt from "jsonwebtoken"
 // Global Config
 
 export const userRouter = express.Router();
@@ -55,33 +56,51 @@ userRouter.post("/", async (req: Request, res: Response) => {
             pwd: hashedPassword,
             eamil: req.body.email
         }
-        //const newUser = new User(req.body.name,hashedPassword,req.body.email);
         let result : any;
         /**
          * * check if the user already exist by cheking the email in the database
          */
-       // let userMail = newUser.getEmail(); 
-       let userType : user
-       let documentType : Document
-      (await collections.user?.findOne({ email : req.body.email}).then((val)=>{
-            if (val === document) {
-                console.log(val.eamil)
-            }
-        }) )  ; //find the best way to make sure that the type is Document befor converting it to user
-        /*function isDocument(test: any): test is Document{
-            return typeof test === new Document();
-        }*/
-    
-
-      
-        //const newUserMail =  as User; 
-        //const mail = on.getEmail();
-        if ( req.body.email != "") {// if the new user is not already in the DB create it
+      const userData = (await collections.user?.findOne({ email : req.body.email}) ) as user; //find the best way to make sure that the type is Document befor converting it to user
+        if ( req.body.email != userData["email"]) {// if the new user is not already in the DB create it
             result = await collections.user?.insertOne(newUser);
         }
         result
             ? res.status(201).send(`Successfully created a new user with id ${result.insertedId}`)
             : res.status(500).send("Failed to create a new user.");
+    } catch (error) {
+        console.error(error);
+        res.status(400).send(error);
+    }
+});
+//login
+userRouter.post("/login", async (req: Request, res: Response) => {
+    try {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.pwd, salt)
+        const userlogging : user = {
+            name: req.body.name,
+            pwd: hashedPassword,
+            eamil: req.body.email
+        }
+        //const newUser = new User(req.body.name,hashedPassword,req.body.email);
+        let result : any;
+        /**
+         * * check if the user already exist by cheking the email in the database
+         */
+      const userData = (await collections.user?.findOne({ email : req.body.email}) ) as user; //find the best way to make sure that the type is Document befor converting it to user
+     
+      const validPawd = await bcrypt.compare(req.body.pwd , userData["password"])  
+      
+      if ( (req.body.email == userData["email"]) && validPawd) {// if the new user is not already in the DB clog him it
+        
+     //!TOKEN SECRET TO HIDE :DGD68*Q6$+l5ll9jk4hgg.
+     //TODO: create a better secret 
+            const token = jwt.sign({_id : userData["_id"]}, "DGD68*Q6$+l5ll9jk4hgg.")
+            res.header('auth-token',token).status(201).send(`Successfully  user with id ${userData["_id"]} name ${userData["userName"]} `)
+            
+        }else {
+            res.status(500).send("email or password is wrong ");
+        }
     } catch (error) {
         console.error(error);
         res.status(400).send(error);
