@@ -2,8 +2,10 @@
 
 import express, { Request, Response } from "express";
 import { ObjectId } from "mongodb";
+import {user , Document} from "../model/model"
 import { collections } from "../service/database.service";
 import {User} from "../model/User";
+import * as bcrypt from "bcrypt";
 // Global Config
 
 export const userRouter = express.Router();
@@ -13,9 +15,9 @@ userRouter.use(express.json());
 
 userRouter.get("/", async (_req: Request, res: Response) => {
     try {
-        // Call find with an empty filter object, meaning it returns all documents in the collection. Saves as Game array to take advantage of types
-        const users = (await collections.user?.find({}).toArray()) as User[];
-
+        // Call find with an empty filter object, meaning it returns all documents in the collection. 
+        //Saves as Game array to take advantage of types
+        const users = (await collections.user?.find({}).toArray()) as user[];
         res.status(200).send(users);
     } catch (error ) {
         res.status(500).send(error);
@@ -28,8 +30,8 @@ userRouter.get("/:id", async (req: Request, res: Response) => {
     try {
         // _id in MongoDB is an objectID type so we need to find our specific document by querying
         const query = { _id: new ObjectId(id) };
-        const user = (await collections.user?.findOne(query)) as User;
-
+        const user = (await collections.user?.findOne(query)) as user;
+console.log(user)
         if (user) {
             res.status(200).send(user);
         }
@@ -38,14 +40,48 @@ userRouter.get("/:id", async (req: Request, res: Response) => {
     }
 });
 // POST
+/**
+ * i can create a new user without having to save the pwd , 
+ * i can create a user who is not already in the database
+ * if the user is already in the database it throw a strange error*
+ * that i don't understand but anyway i works
+ */
 userRouter.post("/", async (req: Request, res: Response) => {
     try {
-        const newGame = req.body as User;
-        const result = await collections.user?.insertOne(newGame);
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.pwd, salt)
+        const newUser : user = {
+            name: req.body.name,
+            pwd: hashedPassword,
+            eamil: req.body.email
+        }
+        //const newUser = new User(req.body.name,hashedPassword,req.body.email);
+        let result : any;
+        /**
+         * * check if the user already exist by cheking the email in the database
+         */
+       // let userMail = newUser.getEmail(); 
+       let userType : user
+       let documentType : Document
+      (await collections.user?.findOne({ email : req.body.email}).then((val)=>{
+            if (val === document) {
+                console.log(val.eamil)
+            }
+        }) )  ; //find the best way to make sure that the type is Document befor converting it to user
+        /*function isDocument(test: any): test is Document{
+            return typeof test === new Document();
+        }*/
+    
 
+      
+        //const newUserMail =  as User; 
+        //const mail = on.getEmail();
+        if ( req.body.email != "") {// if the new user is not already in the DB create it
+            result = await collections.user?.insertOne(newUser);
+        }
         result
-            ? res.status(201).send(`Successfully created a new game with id ${result.insertedId}`)
-            : res.status(500).send("Failed to create a new game.");
+            ? res.status(201).send(`Successfully created a new user with id ${result.insertedId}`)
+            : res.status(500).send("Failed to create a new user.");
     } catch (error) {
         console.error(error);
         res.status(400).send(error);

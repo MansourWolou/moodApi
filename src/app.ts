@@ -36,4 +36,4 @@ class HttpServer {
 }
 
 let server: HttpServer = new HttpServer(PORT)
-server.onStart();
+server.onStart(); 

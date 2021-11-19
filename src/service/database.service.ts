@@ -19,6 +19,11 @@ export async function connectToDatabase () {
     await client.connect();
         
     const db: mongoDB.Db = client.db("memedb");
+      /**
+       **the validation is done on compass but it still don't work
+       */
+      // Apply schema validation to the  user collection
+      //await applyUserSchemaValidation(db);
    
     const userCollection: mongoDB.Collection = db.collection("user");
  
@@ -26,3 +31,34 @@ export async function connectToDatabase () {
        
          console.log(`Successfully connected to database: ${db.databaseName} and collection: ${userCollection.collectionName}`);
  }
+
+// Update our existing collection with JSON schema validation so we know our documents will always match the shape of our Game model, even if added elsewhere.
+// For more information about schema validation, see this blog series: https://www.mongodb.com/blog/post/json-schema-validation--locking-down-your-model-the-smart-way
+async function applyUserSchemaValidation(db: mongoDB.Db) {
+
+  await db.command({
+    "collMod": "user",
+    "validator": {
+        $jsonSchema: {
+            bsonType: "object",
+            required: ["name", "pwd", "email"],
+            additionalProperties: true,
+            properties: {
+            _id: {},
+            name: {
+                bsonType: "string",
+                description: "'name' is required and is a string"
+            },
+            pwd: {
+                bsonType: "string",
+                description: "'pwd' is required and is a string"
+            },
+            email: {
+                bsonType: "string",
+                description: "'email' is required and is a string"
+            }
+            }
+        }
+     }
+});
+}
