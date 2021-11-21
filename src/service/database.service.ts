@@ -8,7 +8,10 @@ import * as dotenv from "dotenv";
 // Global Variables
 //We want to access our collection from outside our service,
 
-export const collections: { user?: mongoDB.Collection } = {}
+export const collections: { user?: mongoDB.Collection ,
+                            properties?:mongoDB.Collection ,
+                            content? : mongoDB.Collection
+                          } = {}
 // Initialize Connection
 
 export async function connectToDatabase () {
@@ -23,42 +26,57 @@ export async function connectToDatabase () {
        **the validation is done on compass but it still don't work
        */
       // Apply schema validation to the  user collection
-      //await applyUserSchemaValidation(db);
+      await applyUserSchemaValidation(db);
    
     const userCollection: mongoDB.Collection = db.collection("user");
+    const propertiesCollecton : mongoDB.Collection = db.collection("properties");
+    const contentCollection : mongoDB.Collection = db.collection("content")
  
   collections.user = userCollection;
+  collections.properties = propertiesCollecton;
+  collections.content = contentCollection;
        
-         console.log(`Successfully connected to database: ${db.databaseName} and collection: ${userCollection.collectionName}`);
+         console.log(`Successfully connected to database: ${db.databaseName} and collection: ${userCollection.collectionName} , ${propertiesCollecton.collectionName} , ${contentCollection.collectionName} `);
  }
 
 // Update our existing collection with JSON schema validation so we know our documents will always match the shape of our Game model, even if added elsewhere.
 // For more information about schema validation, see this blog series: https://www.mongodb.com/blog/post/json-schema-validation--locking-down-your-model-the-smart-way
 async function applyUserSchemaValidation(db: mongoDB.Db) {
 
-  await db.command({
-    "collMod": "user",
-    "validator": {
-        $jsonSchema: {
-            bsonType: "object",
-            required: ["name", "pwd", "email"],
-            additionalProperties: true,
-            properties: {
-            _id: {},
-            name: {
-                bsonType: "string",
-                description: "'name' is required and is a string"
-            },
-            pwd: {
-                bsonType: "string",
-                description: "'pwd' is required and is a string"
-            },
-            email: {
-                bsonType: "string",
-                description: "'email' is required and is a string"
-            }
-            }
-        }
-     }
-});
+const jsonSchema = {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["name", "pwd", "email","schemaVersion"],
+      additionalProperties: true,
+      properties: {
+      _id: {},
+      name: {
+          bsonType: "string",
+          description: "'name' is required and is a string"
+      },
+      pwd: {
+          bsonType: "string",
+          description: "'pwd' is required and is a string"
+      },
+      email: {
+          bsonType: "string",
+          description: "'email' is required and is a string"
+      },
+      schemaVersion: {
+        bsonType: "int",
+        description: "the actuel version of the schema"
+      }
+      }
+  }
+}
+    // Try applying the modification to the collection, if the collection doesn't exist, create it 
+    //!USER DOTENV 
+    await db.command({
+      collMod: "user",
+      validator: jsonSchema
+  }).catch(async (error: mongoDB.MongoServerError) => {
+      if(error.codeName === 'NamespaceNotFound') {
+          await db.createCollection('user', {validator: jsonSchema});
+      }
+  });
 }
