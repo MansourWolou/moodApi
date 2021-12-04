@@ -4,7 +4,16 @@
  */
 // External Dependencies
 import * as mongoDB from "mongodb";
-import * as dotenv from "dotenv";
+import dotenv from 'dotenv';
+let dbName : string;
+let dbConn : string;
+dotenv.config();
+if (typeof process.env.DB_CONN === "string" &&
+    typeof process.env.DB_NAME === "string") {
+      dbConn = process.env.DB_CONN;
+      dbName = process.env.DB_NAME;
+  
+}
 // Global Variables
 //We want to access our collection from outside our service,
 
@@ -15,9 +24,8 @@ export const collections: { user?: mongoDB.Collection ,
 // Initialize Connection
 
 export async function connectToDatabase () {
-    dotenv.config();
  
-    const client: mongoDB.MongoClient = new mongoDB.MongoClient("mongodb+srv://Mansour:wCC8TQQuHs19qHmG@cluster0.kzxle.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+    const client: mongoDB.MongoClient = new mongoDB.MongoClient(dbConn);
             
     await client.connect();
         

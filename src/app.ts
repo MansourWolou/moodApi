@@ -4,39 +4,29 @@ import { connectToDatabase } from "./service/database.service";
 import { userRouter } from "./routes/userRoutes";
 import { propertiesRouter } from './routes/propertiesRoutes';
 import { contentRouter } from './routes/contentRoutes';
-const PORT: number = 8080;
-const app = express();
-
-
-class HttpServer {
-  port: number;
-
-  constructor(port: number) {
-    this.port = port;
-  }
-
-  public async onStart(): Promise<void> {
-    
-    connectToDatabase().then(() => {
-      app.use(express.json());
-      app.use(express.urlencoded({ extended: true }));
-      app.use("/v1/properties",propertiesRouter)
-      app.use("/v1/content",contentRouter)
-      app.use("/v1/user",userRouter);
-      //TODO :
-      //app.use("/v1/Content",contentRouter);
-      //app.use("/v1/metaData",metaDataRouter);
-
-      app.listen(this.port, () => {
-        console.log("Application running at  http://memeApp:" + this.port);
-      });
-    }).catch((error : Error) => {
-      console.error("Database connection failed", error);
-      process.exit();
-      });
-       //! USE DOTENV TO PROTECT THE API KEY 
-  }
+import dotenv from 'dotenv';
+dotenv.config();
+let  PORT: string ;
+if (typeof process.env.PORT === "string") {
+  PORT = process.env.PORT;
 }
 
-let server: HttpServer = new HttpServer(PORT)
-server.onStart(); 
+const app = express();
+
+connectToDatabase().then(() => {
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+  app.use("/v1/properties",propertiesRouter)
+  app.use("/v1/content",contentRouter)
+  app.use("/v1/user",userRouter);
+  //TODO :
+  //app.use("/v1/Content",contentRouter);
+  //app.use("/v1/metaData",metaDataRouter);
+
+  app.listen(PORT, () => {
+    console.log("Application running at  http://memeApp:" + PORT);
+  });
+}).catch((error : Error) => {
+  console.error("Database connection failed", error);
+  process.exit();
+  });
