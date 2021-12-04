@@ -6,16 +6,16 @@ import {user , Document} from "../model/model"
 import { collections } from "../service/database.service";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken"
-import {getAllUsers} from "../controller/getAllUsers"
-import {getUserById} from "../controller/getUserById"
-import {createUserAccount} from "../controller/createUserAccount"
-import {logginUser} from "../controller/logginUser"
-import {userUpdateData} from "../controller/userUpdateData"
-import { userDelete } from "../controller/userDelete";
-import { userContents } from "../controller/userContents";
-import { userDeletContent } from "../controller/userDeletContent";
-import { userFavoritContent } from "../controller/userFavoritContent";
-import { userPostContent } from "../controller/userPostContent";
+import {getAllUsers} from "../controller/userController/getAllUsers"
+import {getUserById} from "../controller/userController/getUserById"
+import {createUserAccount} from "../controller/userController/createUserAccount"
+import {logginUser} from "../controller/userController/logginUser"
+import {userUpdateData} from "../controller/userController/userUpdateData"
+import { userDelete } from "../controller/userController/userDelete";
+import { userContents } from "../controller/userController/userContents";
+import { userDeletContent } from "../controller/userController/userDeletContent";
+import { userFavoritContent } from "../controller/userController/userFavoritContent";
+import { userPostContent } from "../controller/userController/userPostContent";
 // Global Config
 
 export const userRouter = express.Router();

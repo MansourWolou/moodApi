@@ -1,5 +1,4 @@
 import { Express, Request, Response } from "express";
-import { User } from "./model/User";
 
 
 export  function authentication(body : object){

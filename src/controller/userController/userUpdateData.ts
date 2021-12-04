@@ -1,9 +1,8 @@
 
 import express, { Request, Response } from "express";
 import { ObjectId } from "mongodb";
-import {user , Document} from "../model/model"
-import { collections } from "../service/database.service";
-import {User} from "../model/User";
+import {user , Document} from "../../model/model"
+import { collections } from "../../service/database.service";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken"
 // Global Config
@@ -16,7 +15,7 @@ export async function userUpdateData (req: Request, res: Response)  {
     const id = req?.params?.id;
 
     try {
-        const updatedGame: User = req.body as User;
+        const updatedGame: user = req.body as user;
         const query = { _id: new ObjectId(id) };
         // $set adds or updates all fields
         const result = await collections.user?.updateOne(query, { $set: updatedGame });
