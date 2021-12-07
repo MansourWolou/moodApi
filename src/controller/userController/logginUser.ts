@@ -1,12 +1,19 @@
 // External Dependencies
 
 import express, { Request, Response } from "express";
-import { ObjectId } from "mongodb";
-import {user , Document} from "../../model/model"
+import {user } from "../../model/model"
 import { collections } from "../../service/database.service";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken"
+import dotenv from 'dotenv';
+
 // Global Config
+
+dotenv.config();
+let  SECRET: string ;
+if (typeof process.env.SECRET === "string") {
+    SECRET = process.env.SECRET;
+}
 
 export const userRouter = express.Router();
 
@@ -14,32 +21,27 @@ userRouter.use(express.json());
 
 export async function logginUser (req: Request, res: Response)  {
     try {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(req.body.pwd, salt)
-        const userlogging : user = {
-            name: req.body.name,
-            pwd: hashedPassword,
-            email: req.body.email,
-            schemaVersion: 1
-        }
-        //const newUser = new User(req.body.name,hashedPassword,req.body.email);
-        let result : any;
         /**
-         * * check if the user already exist by cheking the email in the database
+         * * check if the user already exist in the database
+         * * send null if the user don't exist in the database
+         * * userData == null if it doesn't find a user with that email in the database 
          */
-      const userData = (await collections.user?.findOne({ email : req.body.email}) ) as user; //find the best way to make sure that the type is Document befor converting it to user
-     
-      const validPawd = await bcrypt.compare(req.body.pwd , userData["password"])  
+        const userData = (await collections.user?.findOne({ email : req.body.email}) ) as user; 
+        //console.log(userData["pwd"]);
+        const validPawd = await bcrypt.compare(req.body.pwd , userData["pwd"])  
+    
+
+      if ( userData == null ) {// if the new user is not already in the DB clog him it
+
+        res.status(500).send("that account doen't exist , try other credencial or create an account");
       
-      if ( (req.body.email == userData["email"]) && validPawd) {// if the new user is not already in the DB clog him it
-        
-     //!TOKEN SECRET TO HIDE :DGD68*Q6$+l5ll9jk4hgg.
-     //TODO: create a better secret 
-            const token = jwt.sign({_id : userData["_id"]}, "DGD68*Q6$+l5ll9jk4hgg.")
-            res.header('auth-token',token).status(201).send(`Successfully  user with id ${userData["_id"]} name ${userData["userName"]} `)
-            
-        }else {
-            res.status(500).send("email or password is wrong ");
+        }else if(validPawd) {
+
+            const token = jwt.sign({_id : userData["_id"]}, SECRET)
+            res.header('auth-token',token).status(201).send(`user  id ${userData["_id"]} name ${userData["userName"]} logged in  `)
+    
+        }else{
+            res.status(401).send("password invalid")
         }
     } catch (error) {
         console.error(error);

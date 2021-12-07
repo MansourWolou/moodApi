@@ -1,34 +1,40 @@
 // External Dependencies
 
 import express, { Request, Response } from "express";
-import { ObjectId } from "mongodb";
 import {user , Document} from "../../model/model"
 import { collections } from "../../service/database.service";
 import * as bcrypt from "bcrypt";
-import * as jwt from "jsonwebtoken"
 // Global Config
 
 export const userRouter = express.Router();
 
 userRouter.use(express.json());
 
+/**
+ * @brief adding a new user to the collection if it not already exist
+ * @param req 
+ * @param res 
+ */
 export async  function createUserAccount (req: Request, res: Response) {
     try {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(req.body.pwd, salt)
+        const salt = await bcrypt.genSalt(10);//* 10 is the complexity of the string generated
+        const hashedPassword = await bcrypt.hash(req.body.pwd, salt)//* the hash is create and only bcryt can decrypt it
         const newUser : user = {
             name: req.body.name,
             pwd: hashedPassword,
-            email: req.body.email,
+            email: req.body.email,//TODO: je n'ai pas encore vérifier si cette adresse mail existe
             schemaVersion: 1
         }
         let result : any;
         /**
-         * * check if the user already exist by cheking the email in the database
+         * * check if the user already exist  in the database
+         * ! there is only one email per account. If a user try to create a new account with an old one that
+         * ! is stored in the database ; it will fail
          */
-      const userData = (await collections.user?.findOne({ email : req.body.email}) ) as user; //find the best way to make sure that the type is Document befor converting it to user
-        console.log( userData)
-      if ( req.body.email != userData["email"]) {// if the new user is not already in the DB create it
+      const userData = (await collections.user?.findOne({ email : req.body.email}) ) as user; 
+       // userData == null if it doesn't find a user with that email in the database 
+       
+      if ( userData == null) {// if the new user is not already in the DB create it
             result = await collections.user?.insertOne(newUser);
         }
         result
