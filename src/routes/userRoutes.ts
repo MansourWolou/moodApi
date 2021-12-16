@@ -19,13 +19,13 @@ export const userRouter = express.Router();
 userRouter.use(express.json());
 
 // GET
-userRouter.get("/",authorization ,getAllUsers );
+userRouter.get("/",authorization ,getAllUsers );//*DONE
 // Example route: http://localhost:8080/games/610aaf458025d42e7ca9fcd0
-userRouter.get("/:id", getUserById);
+userRouter.get("/:id", getUserById);//*DONE
 
-userRouter.post("/", createUserAccount);
+userRouter.post("/", createUserAccount);//*DONE
 //login
-userRouter.post("/login",logginUser);
+userRouter.post("/login",logginUser);//*DONE
 // PUT
 userRouter.put("/:id", userUpdateData);
 // DELETE

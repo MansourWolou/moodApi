@@ -1,10 +1,11 @@
 import { ObjectId } from "bson";
+import * as mongodb from "mongodb";
 
 export interface Document {
     [key: string]: any;
   }
 export interface user extends Document{
-  _id? : ObjectId;
+  _id? : mongodb.ObjectId;
   schemaVersion:number;
   name: String;
   pwd:string;
@@ -14,25 +15,24 @@ export interface user extends Document{
 
 }
 export interface properties extends Document{
-  _id? : ObjectId;
+  _id? : mongodb.ObjectId;
   schemaVersion:number;
   tag : string[];
-  rank : number;
-  autorId : ObjectId;
-  contentId : ObjectId;
+  duration? : number;
+  rank? : number;
+  autorId : mongodb.ObjectId;
+  contentId : mongodb.ObjectId;
 }
-export interface contentObj {
-  contentId : ObjectId
-  theContent : Blob
+export interface data {
+  dataId?: ObjectId;
+  content: mongodb.Binary;
 }
 export interface content extends Document{
-  _id? : ObjectId;
+  _id : mongodb.ObjectId;
   schemaVersion:number;
-  content : contentObj[];
-  rank : number;
-  autorId : ObjectId;
-  contentId : ObjectId;
+  dataMap : data;
 }
+
 /**
  *     getRandomContent():void{}
     getContent():void{}

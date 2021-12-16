@@ -23,7 +23,7 @@ export async  function createUserAccount (req: Request, res: Response) {
             name: req.body.name,
             pwd: hashedPassword,
             email: req.body.email,//TODO: je n'ai pas encore vérifier si cette adresse mail existe
-            schemaVersion: 1
+            schemaVersion: 1//!DON'T FORGET TO CHANGE IT
         }
         let result : any;
         /**
