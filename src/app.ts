@@ -19,14 +19,14 @@ connectToDatabase().then(() => {
   app.use("/v1/properties",propertiesRouter)
   app.use("/v1/content",contentRouter)
   app.use("/v1/user",userRouter);
+  app.use("/",(req,res)=>{res.json("ok")});
   //TODO :
-  //app.use("/v1/Content",contentRouter);
   //app.use("/v1/metaData",metaDataRouter);
 
   app.listen(PORT, () => {
-    console.log("Application running at  http://memeApp:" + PORT);
+    console.log("Application running at  http://localhost:" + PORT);
   });
 }).catch((error : Error) => {
   console.error("Database connection failed", error);
   process.exit();
-  });
+  }); 

@@ -1,5 +1,7 @@
 import { ObjectId } from "bson";
 import * as mongodb from "mongodb";
+import internal from "stream";
+import multer from "multer";
 
 export interface Document {
     [key: string]: any;
@@ -18,14 +20,17 @@ export interface properties extends Document{
   _id? : mongodb.ObjectId;
   schemaVersion:number;
   tag : string[];
+  title?: string;
   duration? : number;
   rank? : number;
-  autorId : mongodb.ObjectId;
+  autorId? : mongodb.ObjectId;
   contentId : mongodb.ObjectId;
 }
 export interface data {
   dataId?: ObjectId;
-  content: mongodb.Binary;
+  content: Express.Multer.File|undefined;
+  size?: number;
+  dims?: number[];
 }
 export interface content extends Document{
   _id : mongodb.ObjectId;

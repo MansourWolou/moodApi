@@ -19,7 +19,7 @@ export const userRouter = express.Router();
 userRouter.use(express.json());
 
 // GET
-userRouter.get("/",authorization ,getAllUsers );//*DONE
+userRouter.get("/",authorization, getAllUsers );//*DONE
 // Example route: http://localhost:8080/games/610aaf458025d42e7ca9fcd0
 userRouter.get("/:id", getUserById);//*DONE
 
