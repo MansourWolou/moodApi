@@ -12,6 +12,7 @@
   "author": "Mansour WOLOU",
   "license": "MIT",
   "dependencies": {
+    "@types/express-fileupload": "^1.2.2",
     "@types/fs-extra": "^9.0.13",
     "@types/jsonwebtoken": "^8.5.6",
     "@types/multer": "^1.4.7",

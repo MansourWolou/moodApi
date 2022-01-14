@@ -5,6 +5,7 @@ import { userRouter } from "./routes/userRoutes";
 import { propertiesRouter } from './routes/propertiesRoutes';
 import { contentRouter } from './routes/contentRoutes';
 import dotenv from 'dotenv';
+
 dotenv.config();
 let  PORT: string ;
 if (typeof process.env.PORT === "string") {

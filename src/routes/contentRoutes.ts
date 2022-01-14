@@ -1,11 +1,10 @@
 
 import express from "express";
 import {addContent} from "../controller/contentController/addContent"
-import {getContent} from "../controller/contentController/getContent"
-import {addContentTest} from "../controller/contentController/addContentTest"
+import {getPropertie} from "../controller/contentController/getPropertie"
 export const contentRouter = express.Router();
 import multer from "multer";
-import assert from "assert";
+import { getContent } from "../controller/contentController/getContent";
 
 const storage = multer.diskStorage({
     destination: (req,file,callback)=>{
@@ -23,7 +22,7 @@ const upload = multer({
 
 contentRouter.use(express.json())
 contentRouter.post("/",upload.single('content'),addContent);
-contentRouter.post("/test",addContentTest);
-contentRouter.get("/",getContent);
+contentRouter.get("/",getPropertie);
+contentRouter.get("/data",getContent);
 
 
