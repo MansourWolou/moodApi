@@ -1,12 +1,11 @@
 // External Dependencies
 
-import { ObjectId } from "bson";
 import * as mongodb from "mongodb";
 import express, { Request, Response } from "express";
 import {content, properties, user } from "../../model/model"
 import { collections } from "../../service/database.service";
-import multer from "multer";
-import assert from "assert";
+import * as fs from 'fs';
+import * as path from 'path';
 
 export const propertiesRouter = express.Router();
 
@@ -14,12 +13,15 @@ propertiesRouter.use(express.json())
 
 
 export async function addContent(req : Request , res : Response){
-    console.log(req.file);
+    const fileName = req.file?.filename;
+    const theFile = Buffer.from(__dirname+"/src/tmp/"+fileName)
+    //console.log(req.files);
+    console.log(theFile);
     const newContent: content={
         _id: new mongodb.ObjectId,
         schemaVersion: 1,
         dataMap: {
-            content: req.file
+            content: new mongodb.Binary(theFile)
         }
     };
     console.log(req.file);

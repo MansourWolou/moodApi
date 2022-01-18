@@ -10,8 +10,8 @@ export const propertiesRouter = express.Router();
 propertiesRouter.use(express.json())
 
 export async function getContent(req:Request, res:Response){
-    let contentId = req.body.contentId;
-    
+    let contentId = req?.params?.id;
+    console.log(contentId)
 
     try {
         //const findSearch =  await collections.properties?.find(search).toArray() 

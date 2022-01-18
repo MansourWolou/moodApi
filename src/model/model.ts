@@ -28,7 +28,7 @@ export interface properties extends Document{
 }
 export interface data {
   dataId?: ObjectId;
-  content: Express.Multer.File|undefined;
+  content: mongodb.Binary;
   size?: number;
   dims?: number[];
 }
